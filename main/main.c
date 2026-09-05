@@ -51,14 +51,24 @@ typedef struct BUTTON_STATE {
 //    }
 //}
 
+static void digital_write(uint8_t pin, bool state)
+{
+    if (state) {
+        SET_BIT(GPIO_ENABLE, pin);
+        return;
+    }
+
+    UNSET_BIT(GPIO_ENABLE, pin);
+    return;
+}
 static void bar(void)
 {
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(250));
-        SET_BIT(GPIO_ENABLE, 2);
+        digital_write(2, true);
         ESP_LOGI(TAG, "LED ON");
         vTaskDelay(pdMS_TO_TICKS(250));
-        UNSET_BIT(GPIO_ENABLE, 2);
+        digital_write(2, false);
         ESP_LOGI(TAG, "LED OFF");
     }
 }
@@ -66,7 +76,6 @@ static void bar(void)
 void app_main(void)
 {
     SET_BIT(GPIO_OUT, 2); // Config gpio 4 as output
-    //gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
 
     bar();
 }

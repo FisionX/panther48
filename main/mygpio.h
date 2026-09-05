@@ -2,6 +2,8 @@
 #ifndef MY_GPIO_H
 #define MY_GPIO_H
 
+#include "sdkconfig.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,6 +11,7 @@ extern "C" {
 #define HWREG32(x)			(*((uint32_t *)(x)))
 
 //GPIO
+#if CONFIG_IDF_TARGET_ESP32
 
 #define GPIO_OUT			(HWREG32(0x3FF44004))
 #define GPIO_W1TS			(HWREG32(0x3FF44008))
@@ -30,6 +33,8 @@ extern "C" {
 #define MCU_SEL (1UL<<13)
 #define FUN_WPU (1UL<<8)
 #define BIT_MSK(X) (1UL<<X)
+
+#endif // CONFIG_IDF_TARGET_ESP32
 
 #ifdef __cplusplus
 }
