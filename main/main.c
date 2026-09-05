@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "esp_log.h"
+#include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 
+#include "hal/gpio_types.h"
 #include "mygpio.h"
 
-#define SET_BIT(reg,x) ((*(uint32_t*)reg) |= (1UL << (uint8_t)x))
-#define UNSET_BIT(reg,x) (*reg &= !(1UL << x))
-#define GET_BIT(reg,x) ((*(uint32_t*)reg >> x) & 0x1)
+#define SET_BIT(reg,x) (reg |= (1UL << (uint8_t)x))
+#define UNSET_BIT(reg,x) (reg &= !(1UL << (uint8_t)x))
+#define GET_BIT(reg,x) ((reg >> x) & 0x1))
 
 #define _BIT(X) (1UL<<X)
 #define BTN1 18
@@ -27,8 +29,8 @@ typedef struct BUTTON_STATE {
 
 [[maybe_unused]]static void set_input_gpio(uint32_t *reg)
 {
-    SET_BIT(reg, FUN_IE);
-    SET_BIT(reg, FUN_WPU);
+    SET_BIT(*reg, FUN_IE);
+    SET_BIT(*reg, FUN_WPU);
 }
 
 //static void foo(void)
@@ -53,19 +55,18 @@ static void bar(void)
 {
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(250));
-        
+        SET_BIT(GPIO_ENABLE, 2);
+        ESP_LOGI(TAG, "LED ON");
+        vTaskDelay(pdMS_TO_TICKS(250));
+        UNSET_BIT(GPIO_ENABLE, 2);
+        ESP_LOGI(TAG, "LED OFF");
     }
 }
 
 void app_main(void)
 {
-    button_state_t state;
-    button_state_t prev_state = {
-        .button1 = GET_BIT(GPIO_IN, BTN1),
-        .button2 = GET_BIT(GPIO_IN, BTN2)
-    };
-    
-    SET_BIT(GPIO_OUT, BIT_MSK(4)); // Config gpio 4 as output
+    SET_BIT(GPIO_OUT, 2); // Config gpio 4 as output
+    //gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
 
     bar();
 }

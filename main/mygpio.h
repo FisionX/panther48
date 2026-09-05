@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#define HWREG32(x)			(*((volatile uint32_t *)(x)))
+#define HWREG32(x)			(*((uint32_t *)(x)))
 
 //GPIO
 
