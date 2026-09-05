@@ -1,15 +1,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "esp_log.h"
-#include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
+#include "driver/gpio.h"
 
-#include "hal/gpio_types.h"
 #include "mygpio.h"
 
-#define SET_BIT(reg,x) (reg |= (1UL << (uint8_t)x))
-#define UNSET_BIT(reg,x) (reg &= !(1UL << (uint8_t)x))
-#define GET_BIT(reg,x) ((reg >> x) & 0x1))
 
 #define _BIT(X) (1UL<<X)
 #define BTN1 18
@@ -26,12 +22,6 @@ typedef struct BUTTON_STATE {
     bool button1;
     bool button2;
 } button_state_t;
-
-[[maybe_unused]]static void set_input_gpio(uint32_t *reg)
-{
-    SET_BIT(*reg, FUN_IE);
-    SET_BIT(*reg, FUN_WPU);
-}
 
 //static void foo(void)
 //{
@@ -51,31 +41,23 @@ typedef struct BUTTON_STATE {
 //    }
 //}
 
-static void digital_write(uint8_t pin, bool state)
-{
-    if (state) {
-        SET_BIT(GPIO_ENABLE, pin);
-        return;
-    }
-
-    UNSET_BIT(GPIO_ENABLE, pin);
-    return;
-}
 static void bar(void)
 {
     while (true) {
         vTaskDelay(pdMS_TO_TICKS(250));
-        digital_write(2, true);
+        mygpio_digital_write(2, true);
         ESP_LOGI(TAG, "LED ON");
         vTaskDelay(pdMS_TO_TICKS(250));
-        digital_write(2, false);
+        mygpio_digital_write(2, false);
         ESP_LOGI(TAG, "LED OFF");
     }
 }
 
 void app_main(void)
 {
-    SET_BIT(GPIO_OUT, 2); // Config gpio 4 as output
+    mygpio_set_direction(2, MYGPIO_MODE_OUTPUT);
 
-    bar();
+    //bar();
+
+    return;
 }

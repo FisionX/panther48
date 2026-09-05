@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MY_GPIO_H
-#define MY_GPIO_H
+#ifndef MY_GPIO_HAL_H
+#define MY_GPIO_HAL_H
 
 #include "sdkconfig.h"
 
@@ -12,6 +12,8 @@ extern "C" {
 
 //GPIO
 #if CONFIG_IDF_TARGET_ESP32
+
+#define GPIO_PIN_COUNT 32
 
 #define GPIO_OUT			(HWREG32(0x3FF44004))
 #define GPIO_W1TS			(HWREG32(0x3FF44008))
@@ -29,15 +31,16 @@ extern "C" {
 #define IOMUX_13			(HWREG32(0x3FF49038))
 #define IOMUX_14			(HWREG32(0x3FF49030))
 
+#endif // CONFIG_IDF_TARGET_ESP32
+
 #define FUN_IE (1UL<<9)
 #define MCU_SEL (1UL<<13)
 #define FUN_WPU (1UL<<8)
 #define BIT_MSK(X) (1UL<<X)
 
-#endif // CONFIG_IDF_TARGET_ESP32
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // MY_GPIO_H
+#endif // MY_GPIO_HAL_H
