@@ -24,7 +24,6 @@ typedef enum GPIO_MODE {
 esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode);
 esp_err_t mygpio_digital_write(uint8_t pin, bool state);
 esp_err_t mygpio_get_level(uint8_t pin, bool *state);
-esp_err_t mygpio_config_iomux18(void);
 
 #ifdef __cplusplus
 }

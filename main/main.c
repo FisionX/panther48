@@ -50,11 +50,6 @@ typedef struct BUTTON_STATE {
 {
     bool btn_state;
 
-    if (mygpio_config_iomux18() != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to config IOMUX 4");
-        return;
-    }
-
     while (true) {
         mygpio_get_level(BTN_BIT, &btn_state);
         if (!btn_state) {
