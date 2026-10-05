@@ -8,9 +8,18 @@
 #include "esp_err.h"
 #include "mygpio_hal.h"
 
-#define SET_BIT(reg,x)   (reg |= (1UL << (uint8_t)x))
-#define UNSET_BIT(reg,x) (reg &= !(1UL << (uint8_t)x))
-#define GET_BIT(reg,x)   ((reg >> x) & 0x1)
+#define IS_IN_RANGE(val, min, max) ((val) >= (min) && (val) <= (max))
+
+#define IS_GPIO(val) ((             \
+    (val) > 19)                     \
+    || IS_IN_RANGE((val), 21, 23)   \
+    || IS_IN_RANGE((val), 25, 27)   \
+    || IS_IN_RANGE((val), 32, 39)   \
+)
+
+#define SET_BIT(reg, x)   (reg |= (1UL << (uint8_t)x))
+#define UNSET_BIT(reg, x) (reg &= !(1UL << (uint8_t)x))
+#define GET_BIT(reg, x)   ((reg >> x) & 0x1)
 
 static const uint32_t IOMUX_ADDR[] =
 {
@@ -55,17 +64,17 @@ static const uint32_t IOMUX_ADDR[] =
 
 static esp_err_t mygpio_config_iomux_in(volatile uint32_t *reg)
 {
-    UNSET_BIT(IOMUX_18, FUN_WPD);
-    UNSET_BIT(IOMUX_18, SLP_SEL);
-    SET_BIT(IOMUX_18, FUN_IE);
-    SET_BIT(IOMUX_18, FUN_WPU);
+    UNSET_BIT(*reg, FUN_WPD);
+    UNSET_BIT(*reg, SLP_SEL);
+    SET_BIT(*reg, FUN_IE);
+    SET_BIT(*reg, FUN_WPU);
 
     return ESP_OK;
 }
 
 esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
 {
-    if (pin > GPIO_PIN_COUNT) {
+    if (IS_GPIO(pin)) {
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -74,9 +83,9 @@ esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
         return ESP_OK;
     }
 
-    UNSET_BIT(GPIO_ENABLE, pin);
+    UNSET_BIT(GPIO_ENABLE, pin); // Disable output mode
 
-    if (mygpio_config_iomux_in((volatile uint32_t*)IOMUX_ADDR[pin])) {
+    if (mygpio_config_iomux_in((volatile uint32_t*)IOMUX_ADDR[pin]) != ESP_OK) {
         return ESP_FAIL;
     }
 
@@ -85,7 +94,7 @@ esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
 
 esp_err_t mygpio_digital_write(uint8_t pin, bool state)
 {
-    if (pin > GPIO_PIN_COUNT) {
+    if (IS_GPIO(pin)) {
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -100,7 +109,7 @@ esp_err_t mygpio_digital_write(uint8_t pin, bool state)
 
 esp_err_t mygpio_get_level(uint8_t pin, bool *state)
 {
-    if (pin > GPIO_PIN_COUNT) {
+    if (IS_GPIO(pin)) {
         return ESP_ERR_INVALID_ARG;
     }
 
