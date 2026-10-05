@@ -6,12 +6,13 @@
 #include <stdio.h>
 #include "mygpio.h"
 #include "esp_err.h"
+#include "esp_intr_types.h"
 #include "mygpio_hal.h"
 
 #define IS_IN_RANGE(val, min, max) ((val) >= (min) && (val) <= (max))
 
-#define IS_GPIO(val) ((             \
-    (val) > 19)                     \
+#define IS_GPIO(val) (              \
+    ((val) > 19)                    \
     || IS_IN_RANGE((val), 21, 23)   \
     || IS_IN_RANGE((val), 25, 27)   \
     || IS_IN_RANGE((val), 32, 39)   \
@@ -105,6 +106,17 @@ esp_err_t mygpio_digital_write(uint8_t pin, bool state)
 
     UNSET_BIT(GPIO_ENABLE, pin);
     return ESP_OK;
+}
+
+esp_err_t mygpio_set_intr(uint8_t pin, intr_handler_t cb)
+{
+    if (IS_GPIO(pin) == false) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    // TODO: set gpio direction in and setup callback
+
+    return ESP_ERR_NOT_FINISHED;
 }
 
 esp_err_t mygpio_get_level(uint8_t pin, bool *state)
