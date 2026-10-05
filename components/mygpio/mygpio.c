@@ -74,7 +74,7 @@ static esp_err_t mygpio_config_iomux_in(volatile uint32_t *reg)
 
 esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
 {
-    if (IS_GPIO(pin)) {
+    if (IS_GPIO(pin) == false) {
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -94,7 +94,7 @@ esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
 
 esp_err_t mygpio_digital_write(uint8_t pin, bool state)
 {
-    if (IS_GPIO(pin)) {
+    if (IS_GPIO(pin) == false) {
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -109,7 +109,7 @@ esp_err_t mygpio_digital_write(uint8_t pin, bool state)
 
 esp_err_t mygpio_get_level(uint8_t pin, bool *state)
 {
-    if (IS_GPIO(pin)) {
+    if (IS_GPIO(pin) == false) {
         return ESP_ERR_INVALID_ARG;
     }
 
