@@ -32,6 +32,8 @@ extern "C" {
 #define GPIO_ENABLE_W1TC	(HWREG32(0x3FF44028))
 #define GPIO_IN				(HWREG32(0x3FF4403C))
 
+#define GPIO_PIN(n)       (HWREG32(0x3FF44088 + (x04 * (n))))
+
 #endif // CONFIG_IDF_TARGET_ESP32
 
 #define FUN_IE  9
