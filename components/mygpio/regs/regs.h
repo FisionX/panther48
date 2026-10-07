@@ -16,6 +16,15 @@
 extern "C" {
 #endif
 
+#define IS_IN_RANGE(val, min, max) ((val) >= (min) && (val) <= (max))
+
+#define IS_GPIO(val) (              \
+    ((val) > 19)                    \
+    || IS_IN_RANGE((val), 21, 23)   \
+    || IS_IN_RANGE((val), 25, 27)   \
+    || IS_IN_RANGE((val), 32, 39)   \
+)
+
 #define HWREG32(x)		(*((volatile uint32_t *)(x)))
 #define BIT_MSK(X)      (1UL<<X)
 

@@ -11,7 +11,6 @@
 #include "freertos/projdefs.h"
 #include "hal/gpio_types.h"
 #include "mygpio.h"
-#include "soc/gpio_num.h"
 
 #define BTN1 18
 #define BTN2 19
