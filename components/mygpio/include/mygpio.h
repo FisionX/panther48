@@ -21,8 +21,6 @@ typedef enum GPIO_MODE {
     MYGPIO_MODE_INPUT
 } mygpio_mode_t;
 
-extern const uint32_t IOMUX_ADDR[40];
-
 esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode);
 esp_err_t mygpio_digital_write(uint8_t pin, bool state);
 esp_err_t mygpio_get_level(uint8_t pin, bool *state);

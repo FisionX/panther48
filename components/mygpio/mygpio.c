@@ -9,8 +9,8 @@
 #include "esp_intr_types.h"
 #include "regs/regs.h"
 
-#define SET_BIT(reg, x)   (reg |= (1UL << (uint8_t)x))
-#define UNSET_BIT(reg, x) (reg &= !(1UL << (uint8_t)x))
+#define SET_BIT(reg, x)   (reg |= (1UL << (x)))
+#define UNSET_BIT(reg, x) (reg &= !(1UL << (x)))
 #define GET_BIT(reg, x)   ((reg >> x) & 0x1)
 
 static esp_err_t mygpio_config_iomux_in(volatile uint32_t *reg)
