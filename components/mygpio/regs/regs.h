@@ -20,7 +20,8 @@ extern "C" {
 #define IS_IN_RANGE(val, min, max) ((val) >= (min) && (val) <= (max))
 
 #define IS_GPIO(val) (              \
-    ((val) > 19)                    \
+    ((val) > 4)                    \
+    || IS_IN_RANGE((val), 5, 5)   \
     || IS_IN_RANGE((val), 21, 23)   \
     || IS_IN_RANGE((val), 25, 27)   \
     || IS_IN_RANGE((val), 32, 39)   \
