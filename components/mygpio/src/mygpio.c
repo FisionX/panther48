@@ -7,7 +7,7 @@
 #include "mygpio.h"
 #include "esp_err.h"
 #include "esp_intr_types.h"
-#include "regs/regs.h"
+#include "regs.h"
 
 #define SET_BIT(reg, x)   (reg |= (1UL << (x)))
 #define UNSET_BIT(reg, x) (reg &= !(1UL << (x)))

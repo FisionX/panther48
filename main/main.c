@@ -1,6 +1,7 @@
 /**
- * @details Example project demonstration for custom made
- * gpio library
+ * @file main.c
+ * @details Main file containing the entry point of the program
+ * @author Fernando R Jacobo & Alejandro Rocha
  */
 // #include <stdio.h>
 // #include <stdint.h>

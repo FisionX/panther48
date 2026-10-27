@@ -2,7 +2,7 @@
  *  @details Application behavior: toggle the LED every second.
  */
 #include "application.h"
-#include "panther48.h"
+#include "panther.h"
 
 // Set up the board and start toggling the LED every second.
 esp_err_t application_init(void)

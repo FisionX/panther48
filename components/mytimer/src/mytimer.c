@@ -1,9 +1,9 @@
-/** @file timer_driver.c
+/** @file mytimer.c
  *  @details Four independent timers. The ISR receives the timer context as its argument.
  */
 #include <stddef.h>
 #include <stdbool.h>
-#include "timer_driver.h"
+#include "mytimer.h"
 #include "timer_hal.h"
 #include "esp_attr.h"
 #include "esp_cpu.h"
@@ -13,13 +13,13 @@
 typedef struct {
     unsigned timer_id;
     intr_handle_t intr;
-    timer_driver_callback_t callback;
+    mytimer_callback_t callback;
     bool initialized;
     volatile esp_err_t last_error;
-} timer_context_t;
+} mytimer_context_t;
 
 // Keep each timer context in internal RAM so the ISR can access it without flash cache.
-static DRAM_ATTR timer_context_t timers[4];
+static DRAM_ATTR mytimer_context_t timers[4];
 
 // Use this table only during setup, not inside the ISR.
 // Entries follow timer IDs 0, 1, 2, 3.
@@ -29,7 +29,7 @@ static const int interrupt_sources[4] = {
 };
 
 // Check the timer ID and calling CPU.
-static esp_err_t timer_driver_validate(unsigned timer_id)
+static esp_err_t mytimer_validate(unsigned timer_id)
 {
     // Validate before indexing arrays or accessing registers.
     if (timer_id > 3) {
@@ -43,9 +43,9 @@ static esp_err_t timer_driver_validate(unsigned timer_id)
 
 // ESP-IDF requires a void ISR. Its argument identifies the timer.
 // Clear the interrupt, run the callback, and rearm the alarm.
-static void IRAM_ATTR timer_driver_isr(void *arg)
+static void IRAM_ATTR mytimer_isr(void *arg)
 {
-    timer_context_t *ctx = arg;
+    mytimer_context_t *ctx = arg;
     esp_err_t ret = hal_timer_ack(ctx->timer_id);
     if (ret != ESP_OK) {
         ctx->last_error = ret;
@@ -69,9 +69,9 @@ static void IRAM_ATTR timer_driver_isr(void *arg)
 }
 
 // Prepare the selected timer and register its callback.
-esp_err_t timer_driver_init(unsigned timer_id, timer_driver_callback_t callback)
+esp_err_t mytimer_init(unsigned timer_id, mytimer_callback_t callback)
 {
-    esp_err_t ret = timer_driver_validate(timer_id);
+    esp_err_t ret = mytimer_validate(timer_id);
     if (ret != ESP_OK) {
         return ret;
     }
@@ -79,7 +79,7 @@ esp_err_t timer_driver_init(unsigned timer_id, timer_driver_callback_t callback)
         return ESP_ERR_INVALID_ARG;
     }
     // Keep driver state indexed by ID; hardware mapping belongs to the HAL.
-    timer_context_t *ctx = &timers[timer_id];
+    mytimer_context_t *ctx = &timers[timer_id];
     if (ctx->initialized) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -93,7 +93,7 @@ esp_err_t timer_driver_init(unsigned timer_id, timer_driver_callback_t callback)
     ret = esp_intr_alloc(interrupt_sources[timer_id],
                          ESP_INTR_FLAG_IRAM | ESP_INTR_FLAG_LEVEL1 |
                          ESP_INTR_FLAG_INTRDISABLED,
-                         timer_driver_isr, ctx, &ctx->intr);
+                         mytimer_isr, ctx, &ctx->intr);
     if (ret != ESP_OK) {
         ctx->callback = NULL;
         return ret;
@@ -103,9 +103,9 @@ esp_err_t timer_driver_init(unsigned timer_id, timer_driver_callback_t callback)
 }
 
 // Start or restart the selected timer with the requested interval.
-esp_err_t timer_driver_start_periodic(unsigned timer_id, uint32_t period_us)
+esp_err_t mytimer_start_periodic(unsigned timer_id, uint32_t period_us)
 {
-    esp_err_t ret = timer_driver_validate(timer_id);
+    esp_err_t ret = mytimer_validate(timer_id);
     if (ret != ESP_OK) {
         return ret;
     }
@@ -113,7 +113,7 @@ esp_err_t timer_driver_start_periodic(unsigned timer_id, uint32_t period_us)
         return ESP_ERR_INVALID_ARG;
     }
     // Keep driver state indexed by ID; hardware mapping belongs to the HAL.
-    timer_context_t *ctx = &timers[timer_id];
+    mytimer_context_t *ctx = &timers[timer_id];
     if (!ctx->initialized) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -140,14 +140,14 @@ esp_err_t timer_driver_start_periodic(unsigned timer_id, uint32_t period_us)
 }
 
 // Stop only the selected timer and disable its interrupt.
-esp_err_t timer_driver_stop(unsigned timer_id)
+esp_err_t mytimer_stop(unsigned timer_id)
 {
-    esp_err_t ret = timer_driver_validate(timer_id);
+    esp_err_t ret = mytimer_validate(timer_id);
     if (ret != ESP_OK) {
         return ret;
     }
     // Keep driver state indexed by ID; hardware mapping belongs to the HAL.
-    timer_context_t *ctx = &timers[timer_id];
+    mytimer_context_t *ctx = &timers[timer_id];
     if (!ctx->initialized) {
         return ESP_ERR_INVALID_STATE;
     }
@@ -159,9 +159,9 @@ esp_err_t timer_driver_stop(unsigned timer_id)
 }
 
 // Copy the selected timer error to the output pointer.
-esp_err_t timer_driver_get_last_error(unsigned timer_id, esp_err_t *error)
+esp_err_t mytimer_get_last_error(unsigned timer_id, esp_err_t *error)
 {
-    esp_err_t ret = timer_driver_validate(timer_id);
+    esp_err_t ret = mytimer_validate(timer_id);
     if (ret != ESP_OK) {
         return ret;
     }
@@ -169,7 +169,7 @@ esp_err_t timer_driver_get_last_error(unsigned timer_id, esp_err_t *error)
         return ESP_ERR_INVALID_ARG;
     }
     // Keep driver state indexed by ID; hardware mapping belongs to the HAL.
-    timer_context_t *ctx = &timers[timer_id];
+    mytimer_context_t *ctx = &timers[timer_id];
     if (!ctx->initialized) {
         return ESP_ERR_INVALID_STATE;
     }

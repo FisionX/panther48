@@ -1,13 +1,13 @@
-/** 
+/**
  * @file hal_timer.c
- * 
+ *
  * @details Access to timer registries.
- * 
+ *
  * @author Alejandro Rocha R.
  */
 
 #include "timer_hal.h"
-#include "regs/timer_regs.h"
+#include "timer_regs.h"
 
 #include <stdbool.h>
 #include "esp_private/periph_ctrl.h"
@@ -22,7 +22,7 @@ static esp_err_t IRAM_ATTR hal_timer_validate(unsigned timer_id)
     if (timer_id > 3) {
         return ESP_ERR_INVALID_ARG;
     }
-    
+
     return ESP_OK;
 }
 
@@ -30,7 +30,7 @@ static esp_err_t IRAM_ATTR hal_timer_validate(unsigned timer_id)
 esp_err_t hal_timer_init(unsigned timer_id)
 {
     esp_err_t ret = hal_timer_validate(timer_id);
-    
+
     if (ret != ESP_OK) {
         return ret;
     }
@@ -46,7 +46,7 @@ esp_err_t hal_timer_init(unsigned timer_id)
         }
         group_enabled[group] = true;
     }
-    
+
     return hal_timer_stop(timer_id);
 }
 
@@ -57,7 +57,7 @@ esp_err_t hal_timer_configure(unsigned timer_id, uint32_t period_us)
     if (ret != ESP_OK) {
         return ret;
     }
-    
+
     // Only the HAL converts the ID into register coordinates.
     unsigned group = timer_id / 2U;
     unsigned timer = timer_id % 2U;

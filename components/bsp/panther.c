@@ -2,9 +2,9 @@
  *  @details Board resources and the connection between timer and LED.
  */
 #include <stdbool.h>
-#include "panther48.h"
+#include "panther.h"
 #include "led_driver.h"
-#include "timer_driver.h"
+#include "mytimer.h"
 #include "esp_attr.h"
 #include "esp_cpu.h"
 
@@ -37,7 +37,7 @@ esp_err_t bsp_init(void)
         return ret;
     }
     // Register the callback once. Start counting in a separate call.
-    ret = timer_driver_init(LED_TIMER_ID, bsp_led_toggle);
+    ret = mytimer_init(LED_TIMER_ID, bsp_led_toggle);
     if (ret != ESP_OK) {
         return ret;
     }
@@ -54,7 +54,7 @@ esp_err_t bsp_led_blink_start(uint32_t interval_us)
     if (!initialized) {
         return ESP_ERR_INVALID_STATE;
     }
-    return timer_driver_start_periodic(LED_TIMER_ID, interval_us);
+    return mytimer_start_periodic(LED_TIMER_ID, interval_us);
 }
 
 // Stop the blink timer and turn the LED off.
@@ -64,7 +64,7 @@ esp_err_t bsp_led_blink_stop(void)
         return ESP_ERR_INVALID_STATE;
     }
     // Stop callbacks before changing the LED from the main task.
-    esp_err_t ret = timer_driver_stop(LED_TIMER_ID);
+    esp_err_t ret = mytimer_stop(LED_TIMER_ID);
     if (ret != ESP_OK) {
         return ret;
     }
@@ -80,5 +80,5 @@ esp_err_t bsp_led_blink_get_error(esp_err_t *error)
     if (!initialized) {
         return ESP_ERR_INVALID_STATE;
     }
-    return timer_driver_get_last_error(LED_TIMER_ID, error);
+    return mytimer_get_last_error(LED_TIMER_ID, error);
 }
