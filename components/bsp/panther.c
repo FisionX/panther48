@@ -6,39 +6,41 @@
 #include "led_driver.h"
 #include "mytimer.h"
 #include "esp_attr.h"
+#include "esp_log.h"
 #include "esp_cpu.h"
+#include "freertos/FreeRTOS.h"
+#include "portmacro.h"
 
 // Panther status LED on GPIO5, active high.
 #define LED_BIT 5u
 // Select one timer ID (0-3); the driver chooses its group automatically.
 #define LED_TIMER_ID 0u
+
+static char* TAG = "panther";
 static bool initialized;
 
 // Connect timer events to the LED driver.
 // This callback runs in the ISR: do not print, wait, or block.
-static esp_err_t bsp_led_toggle(void)
+static esp_err_t panther_led_toggle(void)
 {
     return led_driver_toggle();
 }
 
 // Prepare the LED and connect its callback to the selected timer.
-esp_err_t bsp_init(void)
+esp_err_t panther_init(void)
 {
     // Check the calling CPU before accessing hardware.
     if (esp_cpu_get_core_id() != 0) {
         return ESP_ERR_INVALID_STATE;
     }
     if (initialized) {
+        ESP_LOGE(TAG, "bsp is already initialized");
         return ESP_ERR_INVALID_STATE;
     }
     // Keep the LED off until timer setup is complete.
     esp_err_t ret = led_driver_init(LED_BIT);
     if (ret != ESP_OK) {
-        return ret;
-    }
-    // Register the callback once. Start counting in a separate call.
-    ret = mytimer_init(LED_TIMER_ID, bsp_led_toggle);
-    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Could not start led driver");
         return ret;
     }
     initialized = true;
@@ -46,19 +48,19 @@ esp_err_t bsp_init(void)
 }
 
 // Start blinking with the interval given in microseconds.
-esp_err_t bsp_led_blink_start(uint32_t interval_us)
+esp_err_t panther_led_blink_start(uint32_t interval_us)
 {
     if (interval_us == 0) {
         return ESP_ERR_INVALID_ARG;
     }
-    if (!initialized) {
+    if (initialized == false) {
         return ESP_ERR_INVALID_STATE;
     }
     return mytimer_start_periodic(LED_TIMER_ID, interval_us);
 }
 
 // Stop the blink timer and turn the LED off.
-esp_err_t bsp_led_blink_stop(void)
+esp_err_t panther_led_blink_stop(void)
 {
     if (!initialized) {
         return ESP_ERR_INVALID_STATE;
@@ -72,12 +74,12 @@ esp_err_t bsp_led_blink_stop(void)
 }
 
 // Return the query status; write the saved timer error to *error.
-esp_err_t bsp_led_blink_get_error(esp_err_t *error)
+esp_err_t panther_led_blink_get_error(esp_err_t *error)
 {
     if (error == NULL) {
         return ESP_ERR_INVALID_ARG;
     }
-    if (!initialized) {
+    if (initialized == false) {
         return ESP_ERR_INVALID_STATE;
     }
     return mytimer_get_last_error(LED_TIMER_ID, error);
