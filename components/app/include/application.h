@@ -1,3 +1,7 @@
+/**
+ * @file application.h
+ * @brief Application initialization and periodic LED blinking control.
+ */
 #pragma once
 #include <stdint.h>
 #include "esp_err.h"

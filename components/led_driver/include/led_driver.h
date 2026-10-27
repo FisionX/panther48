@@ -1,3 +1,7 @@
+/**
+ * @file led_driver.h
+ * @brief Initialization and state control for an active-high LED.
+ */
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>

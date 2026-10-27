@@ -1,5 +1,6 @@
-/** @file mytimer.h
- *  @details Timer API for TG0/T0, TG0/T1, TG1/T0, and TG1/T1 on classic ESP32.
+/**
+ * @file mytimer.h
+ * @brief ESP32 hardware timer initialization and periodic interrupt control API.
  */
 #pragma once
 #ifndef MYTIMER_H

@@ -1,10 +1,6 @@
 /**
  * @file mygpio.h
- * @details Public API for mygpio demo library
- * This library is just a demonstration, nobody with a perfectly
- * working brain would directly mess with the plain registers on
- * a real application...
- * @author Fernando R. Jacobo
+ * @brief GPIO direction, digital I/O, and edge interrupt configuration API.
  */
 #pragma once
 #ifndef MY_GPIO_H
