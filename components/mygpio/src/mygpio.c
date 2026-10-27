@@ -36,7 +36,7 @@ esp_err_t mygpio_set_direction(uint8_t pin, mygpio_mode_t mode)
 
     UNSET_BIT(GPIO_ENABLE, pin); // Disable output mode
 
-    if (mygpio_config_iomux_in((volatile uint32_t*)IOMUX_ADDR[pin]) != ESP_OK) {
+    if (mygpio_config_iomux_in((volatile uint32_t*)&IOMUX_ADDR[pin]) != ESP_OK) {
         return ESP_FAIL;
     }
 
